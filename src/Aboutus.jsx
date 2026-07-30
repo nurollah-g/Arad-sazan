@@ -1,67 +1,10 @@
-import { useState, useEffect, useRef } from "react";
-import excavationImg from "./assets/stage-excavation.jpg";
-import foundationImg from "./assets/stage-foundation.jpg";
-import framingImg from "./assets/stage-framing.jpg";
-import envelopeImg from "./assets/stage-envelope.jpg";
-import finishedImg from "./assets/stage-finished.jpg";
-import logo from "./assets/logo.png";
-
-const STAGE_IMAGES = {
-  excavation: excavationImg,
-  foundation: foundationImg,
-  framing: framingImg,
-  envelope: envelopeImg,
-  finished: finishedImg,
-};
-
-const STAGES = [
-  {
-    key: "excavation",
-    label: "EXCAVATION",
-    coord: "LOT 04 / SITE PREP",
-    heading: "Every build starts\nin the dirt.",
-    caption:
-      "We survey, grade, and cut the pad before a single beam goes up — so the house that follows never has to fight its own foundation.",
-  },
-  {
-    key: "foundation",
-    label: "FOUNDATION",
-    coord: "LOT 04 / STAGE 01",
-    heading: "We build\nsensational spaces.",
-    caption:
-      "Calling us interior designers or a design firm is a disservice to both you and us. We're your partner and owner's representative from day one.",
-  },
-  {
-    key: "framing",
-    label: "FRAMING",
-    coord: "LOT 04 / STAGE 02",
-    heading: "From concept & 3D\nto elevations.",
-    caption:
-      "Full detail matter, including the merch-ups. Nice things cost, but they don't need to cost 4x. We save you thousands without compromising the look you desire.",
-  },
-  {
-    key: "envelope",
-    label: "ENVELOPE",
-    coord: "LOT 04 / STAGE 03",
-    heading: "Award winning\ndesign & build.",
-    caption:
-      "Full service beyond 'interior design' — glazing, cladding, and mechanical rough-in executed to the same standard as the render.",
-  },
-  {
-    key: "finished",
-    label: "COMPLETE",
-    coord: "LOT 04 / DELIVERED",
-    heading: "Creating\ncool sh!t.",
-    caption:
-      "We advocate, we find, we design, we build, we procure, we warehouse, we manage, and we execute at the highest level from coast to coast.",
-  },
-];
+import { useEffect, useRef, useState } from "react";
 
 const NAV_LINKS = [
   { label: "Home", path: "/" },
   { label: "About us", path: "/AboutUs" },
-  { label: "Our work", path: "/OurWork" },
-  { label: "Contact", path: "#contact" },
+  { label: "Our work", path: "#" },
+  { label: "Contact", path: "#" },
 ];
 
 const STATS = [
@@ -126,33 +69,6 @@ const TEAM = [
     bio: "Keeps the schedule honest and the trades on the same page as the drawing.",
   },
 ];
-
-function useScrollProgress(containerRef) {
-  const [progress, setProgress] = useState(0);
-
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-
-    const onScroll = () => {
-      const rect = el.getBoundingClientRect();
-      const total = el.scrollHeight - window.innerHeight;
-      const scrolled = Math.min(Math.max(-rect.top, 0), total);
-      const pct = total > 0 ? scrolled / total : 0;
-      setProgress(pct);
-    };
-
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-    };
-  }, [containerRef]);
-
-  return progress;
-}
 
 function useReveal() {
   const ref = useRef(null);
@@ -302,51 +218,39 @@ function BlueprintElevation() {
   );
 }
 
-export default function ConstructionHero() {
-  const scrollRef = useRef(null);
-  const progress = useScrollProgress(scrollRef);
+export default function AboutUs() {
+  const [scrolled, setScrolled] = useState(false);
 
-  const stageCount = STAGES.length;
-  const rawIndex = progress * (stageCount - 1);
-  const activeIndex = Math.min(
-    stageCount - 1,
-    Math.max(0, Math.round(rawIndex)),
-  );
-  const activeStage = STAGES[activeIndex];
-
-  // Crossfade weight between current and next stage image for a smooth scrub
-  const lowerIndex = Math.min(stageCount - 1, Math.floor(rawIndex));
-  const upperIndex = Math.min(stageCount - 1, lowerIndex + 1);
-  const blend = rawIndex - lowerIndex;
-
-  const scrolledPastHero = progress > 0.01;
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
-    <div className="bg-[#0B0C0E] text-[#F2EEE7]">
+    <div className="bg-[#0B0C0E] text-[#F2EEE7] min-h-screen">
       {/* ============================ NAV ============================ */}
       <nav
-        className={`fixed top-0 inset-x-0 z-50 flex items-center justify-between px-6 md:px-10 py-4 transition-all duration-500 ${
-          scrolledPastHero
-            ? "bg-black/20 backdrop-blur-sm border-b border-white/10"
-            : "bg-transparent border-b border-transparent"
+        className={`fixed top-0 inset-x-0 z-50 flex items-center justify-between px-6 md:px-10 py-3 transition-colors duration-500 ${
+          scrolled
+            ? "bg-[#0B0C0E]/70 backdrop-blur-md border-b border-white/10"
+            : "bg-transparent"
         }`}
       >
-        <div className="flex items-center gap-2">
-          <img
-            src={logo}
-            alt="LOGO"
-            className="h-12 md:h-18 w-auto object-contain "
-          />
-          {/* <span className="font-mono text-[14px] tracking-[0.25em] uppercase text-[#F2EEE7]/80">
-            AradSazan
-          </span> */}
-        </div>
+        <span className="font-mono text-[13px] tracking-[0.25em] uppercase text-[#F2EEE7]/80">
+          AradSazan
+        </span>
         <div className="hidden md:flex items-center gap-8">
           {NAV_LINKS.map((link) => (
             <a
               key={link.label}
               href={link.path}
-              className="text-[13px] tracking-wide text-[#F2EEE7]/70 hover:text-[#F2EEE7] transition-colors"
+              className={`text-[13px] tracking-wide transition-colors ${
+                link === "About us"
+                  ? "text-[#C98A54]"
+                  : "text-[#F2EEE7]/70 hover:text-[#F2EEE7]"
+              }`}
             >
               {link.label}
             </a>
@@ -360,112 +264,40 @@ export default function ConstructionHero() {
         </a>
       </nav>
 
-      {/* ==================== SCROLL-SCRUBBED HERO ==================== */}
-      <section ref={scrollRef} className="relative" style={{ height: "500vh" }}>
-        <div className="sticky top-0 h-screen w-full overflow-hidden">
-          <img
-            src={STAGE_IMAGES[STAGES[lowerIndex].key]}
-            alt=""
-            className="absolute inset-0 h-full w-full object-cover"
-            style={{ opacity: 1 - blend }}
-          />
-          <img
-            src={STAGE_IMAGES[STAGES[upperIndex].key]}
-            alt=""
-            className="absolute inset-0 h-full w-full object-cover"
-            style={{ opacity: blend }}
-          />
-
-          {/* Fog / atmosphere layer */}
-          <div className="absolute inset-0 pointer-events-none">
-            <div
-              className="absolute inset-0 opacity-40 mix-blend-screen"
-              style={{
-                background:
-                  "radial-gradient(ellipse 60% 40% at 30% 70%, rgba(139,154,140,0.35), transparent 60%), radial-gradient(ellipse 50% 30% at 70% 60%, rgba(139,154,140,0.25), transparent 65%)",
-              }}
-            />
-            <div className="absolute inset-0 bg-linear-to-t from-[#0B0C0E] via-transparent to-[#0B0C0E]/30" />
-          </div>
-
-          {/* Heading + caption, bottom-left */}
-          <div className="absolute bottom-28 md:bottom-24 left-6 md:left-14 max-w-md">
-            <p className="font-mono text-[10px] tracking-[0.3em] text-[#C98A54] mb-3 uppercase">
-              {activeStage.label}
-            </p>
-            <h1 className="font-serif text-4xl md:text-5xl leading-[1.05] whitespace-pre-line mb-4">
-              {activeStage.heading}
-            </h1>
-            <p className="text-sm text-[#F2EEE7]/70 leading-relaxed mb-6 max-w-sm">
-              {activeStage.caption}
-            </p>
-            {activeIndex === 0 && (
-              <div className="flex gap-3">
-                <button className="text-[11px] font-mono tracking-[0.2em] uppercase bg-[#F2EEE7] text-[#0B0C0E] px-5 py-3 rounded-full hover:bg-[#C98A54] transition-colors">
-                  Learn more
-                </button>
-                <button className="text-[11px] font-mono tracking-[0.2em] uppercase border border-[#F2EEE7]/40 px-5 py-3 rounded-full hover:border-[#F2EEE7] transition-colors">
-                  Contact us
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* Scroll-to-explore prompt, only at the very start */}
-          {progress < 0.03 && (
-            <div className="absolute bottom-16 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-pulse">
-              <div className="h-8 w-5 rounded-full border border-[#F2EEE7]/50 flex items-start justify-center p-1">
-                <div className="h-1.5 w-1.5 rounded-full bg-[#F2EEE7]/70" />
-              </div>
-              <span className="font-mono text-[9px] tracking-[0.25em] uppercase text-[#F2EEE7]/50">
-                Scroll to explore
-              </span>
-            </div>
-          )}
-
-          {/* Stage rail, bottom */}
-          <div className="absolute bottom-0 inset-x-0 px-6 md:px-10 pb-5">
-            <div className="flex justify-between mb-2">
-              {STAGES.map((s, i) => (
-                <span
-                  key={s.key}
-                  className={`font-mono text-[9px] tracking-[0.15em] uppercase transition-colors duration-300 ${
-                    i === activeIndex ? "text-[#C98A54]" : "text-[#F2EEE7]/30"
-                  }`}
-                >
-                  {s.label}
-                </span>
-              ))}
-            </div>
-            <div className="h-0.5 w-full bg-white/10 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-[#C98A54] transition-[width] duration-100 ease-linear"
-                style={{ width: `${progress * 100}%` }}
-              />
-            </div>
-          </div>
+      {/* ============================ HERO ============================ */}
+      <section className="relative pt-40 pb-24 px-6 md:px-14 overflow-hidden">
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.06]"
+          style={{
+            backgroundImage:
+              "linear-gradient(#F2EEE7 1px, transparent 1px), linear-gradient(90deg, #F2EEE7 1px, transparent 1px)",
+            backgroundSize: "40px 40px",
+          }}
+        />
+        <div className="relative max-w-3xl">
+          <p className="font-mono text-[10px] tracking-[0.3em] text-[#C98A54] mb-4 uppercase">
+            Company dossier / est. 2014
+          </p>
+          <h1 className="font-serif text-4xl md:text-6xl leading-[1.05] mb-6">
+            We're not decorators.
+            <br />
+            We're your rep on site.
+          </h1>
+          <p className="text-[#F2EEE7]/70 leading-relaxed max-w-xl">
+            AradSazan started as three people who were tired of watching good
+            renders die on a bad site. We build the same drawing we sell you —
+            and we stand on the lot until it matches.
+          </p>
         </div>
       </section>
 
-      {/* ============================ ABOUT: STATS ============================ */}
-
-      <section
-        id="about"
-        className="px-6 md:px-14 pb-24 pt-28 border-t border-white/10"
-      >
-        <Reveal className="max-w-2xl mb-10">
-          <p className="font-mono text-[10px] tracking-[0.3em] text-[#C98A54] mb-4 uppercase">
-            The record so far
-          </p>
-          <h2 className="font-serif text-3xl md:text-4xl leading-tight">
-            Numbers we can actually stand behind.
-          </h2>
-        </Reveal>
-        <Reveal className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-5xl">
+      {/* ============================ STATS ============================ */}
+      <section className="px-6 md:px-14 pb-24">
+        <Reveal className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {STATS.map((s) => (
             <div
               key={s.label}
-              className="border border-white/10 rounded-sm px-6 py-8 bg-white/2"
+              className="border border-white/10 rounded-sm px-6 py-8 bg-white/[0.02]"
             >
               <p className="font-mono text-[9px] tracking-[0.2em] text-[#F2EEE7]/40 uppercase mb-3">
                 {s.coord}
@@ -480,7 +312,7 @@ export default function ConstructionHero() {
         </Reveal>
       </section>
 
-      {/* ============================ ABOUT: PHILOSOPHY ============================ */}
+      {/* ============================ PHILOSOPHY ============================ */}
       <section className="px-6 md:px-14 pb-28 border-t border-white/10 pt-20">
         <div className="grid md:grid-cols-2 gap-14 items-center max-w-6xl mx-auto">
           <Reveal>
@@ -501,13 +333,13 @@ export default function ConstructionHero() {
               whole pitch.
             </p>
           </Reveal>
-          <Reveal className="border border-white/10 rounded-sm p-4 bg-white/2">
+          <Reveal className="border border-white/10 rounded-sm p-4 bg-white/[0.02]">
             <BlueprintElevation />
           </Reveal>
         </div>
       </section>
 
-      {/* ============================ ABOUT: PROCESS ============================ */}
+      {/* ============================ PROCESS ============================ */}
       <section className="px-6 md:px-14 pb-28 border-t border-white/10 pt-20">
         <Reveal className="max-w-2xl mb-14">
           <p className="font-mono text-[10px] tracking-[0.3em] text-[#C98A54] mb-4 uppercase">
@@ -534,7 +366,7 @@ export default function ConstructionHero() {
         </div>
       </section>
 
-      {/* ============================ ABOUT: TEAM ============================ */}
+      {/* ============================ TEAM ============================ */}
       <section className="px-6 md:px-14 pb-28 border-t border-white/10 pt-20">
         <Reveal className="max-w-2xl mb-14">
           <p className="font-mono text-[10px] tracking-[0.3em] text-[#C98A54] mb-4 uppercase">
@@ -548,7 +380,7 @@ export default function ConstructionHero() {
           {TEAM.map((person) => (
             <Reveal
               key={person.name}
-              className="border border-white/10 rounded-sm p-6 bg-white/2 hover:border-[#C98A54]/40 transition-colors"
+              className="border border-white/10 rounded-sm p-6 bg-white/[0.02] hover:border-[#C98A54]/40 transition-colors"
             >
               <div className="flex items-center justify-between mb-6">
                 <div className="h-11 w-11 rounded-full border border-[#C98A54]/50 flex items-center justify-center font-mono text-xs text-[#C98A54]">
@@ -570,16 +402,16 @@ export default function ConstructionHero() {
         </div>
       </section>
 
-      {/* ==================== CONTACT ==================== */}
+      {/* ============================ CONTACT CTA ============================ */}
       <section
         id="contact"
-        className="min-h-screen flex flex-col items-center justify-center px-6 text-center border-t border-white/10"
+        className="min-h-[60vh] flex flex-col items-center justify-center px-6 text-center border-t border-white/10"
       >
         <p className="font-mono text-[10px] tracking-[0.3em] text-[#C98A54] mb-4 uppercase">
           Ready when you are
         </p>
         <h2 className="font-serif text-3xl md:text-4xl max-w-lg mb-6">
-          Let's build something worth the fog machine.
+          Let's put your name on the coordinate tag.
         </h2>
         <button className="text-[11px] font-mono tracking-[0.2em] uppercase bg-[#F2EEE7] text-[#0B0C0E] px-6 py-3 rounded-full hover:bg-[#C98A54] transition-colors">
           Contact us
