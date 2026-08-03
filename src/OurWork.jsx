@@ -4,7 +4,7 @@ const NAV_LINKS = [
   { label: "Home", path: "/" },
   { label: "About us", path: "/AboutUs" },
   { label: "Our work", path: "/OurWork" },
-  { label: "Contact", path: "#contact" },
+  { label: "Contact", path: "/Contact" },
 ];
 
 const CATEGORIES = ["All", "Residential", "Commercial", "Renovation"];
@@ -18,7 +18,6 @@ const PROJECTS = [
     coord: "LOT 04 / QOM",
     blurb:
       "A four-stage build from raw excavation to a finished envelope, documented at every phase.",
-    hue: "#C98A54",
   },
   {
     id: "02",
@@ -28,7 +27,6 @@ const PROJECTS = [
     coord: "LOT 11 / CBD",
     blurb:
       "Full mechanical rough-in and glazing package delivered to render-grade finish.",
-    hue: "#8B9A8C",
   },
   {
     id: "03",
@@ -38,7 +36,6 @@ const PROJECTS = [
     coord: "LOT 07 / BAHARESTAN",
     blurb:
       "Concept-to-elevation design work paired with in-house procurement and build.",
-    hue: "#C98A54",
   },
   {
     id: "04",
@@ -48,7 +45,6 @@ const PROJECTS = [
     coord: "LOT 02 / SAFAIYEH",
     blurb:
       "Cladding and storefront glazing executed to the same standard as the original render.",
-    hue: "#8B9A8C",
   },
   {
     id: "05",
@@ -58,7 +54,6 @@ const PROJECTS = [
     coord: "LOT 09 / FERDOWS",
     blurb:
       "Structural rework behind a full interior and envelope refresh, on an occupied site.",
-    hue: "#A8763F",
   },
   {
     id: "06",
@@ -68,9 +63,30 @@ const PROJECTS = [
     coord: "LOT 15 / AZADI",
     blurb:
       "A full rooftop level added without touching the building's working ground floor.",
-    hue: "#A8763F",
   },
 ];
+
+// material composition per category — like a geological core sample from the site
+const CORE_BANDS = {
+  Residential: [
+    { color: "#C7C2B8", weight: 3 },
+    { color: "#8C6239", weight: 2 },
+    { color: "#4A4F52", weight: 2 },
+    { color: "#E8542E", weight: 1 },
+  ],
+  Commercial: [
+    { color: "#4A4F52", weight: 3 },
+    { color: "#6E7476", weight: 2 },
+    { color: "#C7C2B8", weight: 2 },
+    { color: "#E8542E", weight: 1 },
+  ],
+  Renovation: [
+    { color: "#8C6239", weight: 2 },
+    { color: "#E8542E", weight: 2 },
+    { color: "#4A4F52", weight: 3 },
+    { color: "#C7C2B8", weight: 1 },
+  ],
+};
 
 function useReveal() {
   const ref = useRef(null);
@@ -109,47 +125,40 @@ function Reveal({ as: Tag = "div", className = "", children }) {
   );
 }
 
-function ProjectPlaceholder({ hue, id }) {
+function CoreSample({ category }) {
+  const bands = CORE_BANDS[category] || CORE_BANDS.Residential;
   return (
-    <div
-      className="relative w-full aspect-[4/3] overflow-hidden rounded-sm border border-white/10"
-      style={{
-        background: `linear-gradient(160deg, ${hue}22 0%, #0B0C0E 70%)`,
-      }}
-    >
-      {/* blueprint grid overlay */}
-      <div
-        className="absolute inset-0 opacity-[0.15]"
-        style={{
-          backgroundImage:
-            "linear-gradient(#F2EEE7 1px, transparent 1px), linear-gradient(90deg, #F2EEE7 1px, transparent 1px)",
-          backgroundSize: "28px 28px",
-        }}
-      />
-      {/* simple structural sketch, color varies per project */}
-      <svg
-        viewBox="0 0 200 150"
-        className="absolute inset-0 w-full h-full"
-        fill="none"
-        stroke={hue}
-        strokeWidth="1.2"
-        strokeOpacity="0.8"
-      >
-        <path d="M30 120 L30 70 L100 35 L170 70 L170 120 Z" />
-        <line x1="30" y1="120" x2="170" y2="120" />
-        <line
-          x1="100"
-          y1="35"
-          x2="100"
-          y2="120"
-          strokeDasharray="2 3"
-          strokeOpacity="0.4"
-        />
-      </svg>
-      <span className="absolute bottom-3 left-3 font-mono text-[9px] tracking-[0.15em] text-[#F2EEE7]/50 uppercase">
-        FIG. {id}
-      </span>
+    <div className="absolute left-0 top-0 bottom-0 w-3 flex flex-col overflow-hidden border-r border-black/40">
+      {bands.map((b, i) => (
+        <div
+          key={i}
+          style={{ flexGrow: b.weight, background: b.color }}
+          className="relative"
+        >
+          <div
+            className="absolute inset-0 opacity-10"
+            style={{
+              backgroundImage:
+                "repeating-linear-gradient(0deg, transparent, transparent 3px, #000 3px, #000 4px)",
+            }}
+          />
+        </div>
+      ))}
     </div>
+  );
+}
+
+function Rivets() {
+  const dot = "absolute w-1 h-1 rounded-full bg-[#C7C2B8]/15";
+  return (
+    <>
+      <span className={`${dot} top-1.5 right-1.5`} />
+      <span
+        className={`$
+
+{dot} bottom-1.5 right-1.5`}
+      />
+    </>
   );
 }
 
@@ -170,16 +179,20 @@ export default function OurWork() {
       : PROJECTS.filter((p) => p.category === activeCategory);
 
   return (
-    <div className="bg-[#0B0C0E] text-[#F2EEE7] min-h-screen">
+    <div className="bg-[#121210] text-[#C7C2B8] min-h-screen">
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap');
+      `}</style>
+
       {/* ============================ NAV ============================ */}
       <nav
-        className={`fixed top-0 inset-x-0 z-50 flex items-center justify-between px-6 md:px-10 py-4 transition-all duration-500 ${
+        className={`fixed top-0 inset-x-0 z-50 flex items-center justify-between px-6 md:px-10 py-4 transition-all duration-500 border-b-2 ${
           scrolled
-            ? "bg-black/20 backdrop-blur-sm border-b border-white/10"
-            : "bg-transparent border-b border-transparent"
+            ? "bg-[#0E0E0C] border-[#E8542E]/60"
+            : "bg-transparent border-transparent"
         }`}
       >
-        <span className="font-mono text-[13px] tracking-[0.25em] uppercase text-[#F2EEE7]/80">
+        <span className="font-['IBM_Plex_Mono'] text-[13px] tracking-[0.25em] uppercase text-[#C7C2B8]/80">
           AradSazan
         </span>
         <div className="hidden md:flex items-center gap-8">
@@ -187,10 +200,10 @@ export default function OurWork() {
             <a
               key={link.label}
               href={link.path}
-              className={`text-[13px] tracking-wide transition-colors ${
+              className={`font-['IBM_Plex_Sans'] text-[13px] tracking-wide transition-colors ${
                 link.label === "Our work"
-                  ? "text-[#C98A54]"
-                  : "text-[#F2EEE7]/70 hover:text-[#F2EEE7]"
+                  ? "text-[#E8542E]"
+                  : "text-[#C7C2B8]/70 hover:text-[#C7C2B8]"
               }`}
             >
               {link.label}
@@ -199,32 +212,40 @@ export default function OurWork() {
         </div>
         <a
           href="#contact"
-          className="text-[11px] font-mono tracking-[0.2em] uppercase border border-[#C98A54]/60 text-[#C98A54] px-4 py-2 rounded-full hover:bg-[#C98A54] hover:text-[#0B0C0E] transition-colors"
+          className="text-[11px] font-['IBM_Plex_Mono'] tracking-[0.2em] uppercase border border-dashed border-[#E8542E]/70 text-[#E8542E] px-4 py-2 hover:bg-[#E8542E] hover:text-[#121210] hover:border-solid transition-colors"
         >
-          Get a consulation
+          Request quote
         </a>
       </nav>
 
       {/* ============================ HERO ============================ */}
       <section className="relative pt-40 pb-16 px-6 md:px-14 overflow-hidden">
         <div
-          className="pointer-events-none absolute inset-0 opacity-[0.06]"
+          className="pointer-events-none absolute inset-0 opacity-[0.05]"
           style={{
-            backgroundImage:
-              "linear-gradient(#F2EEE7 1px, transparent 1px), linear-gradient(90deg, #F2EEE7 1px, transparent 1px)",
-            backgroundSize: "40px 40px",
+            backgroundImage: "radial-gradient(#C7C2B8 1px, transparent 1px)",
+            backgroundSize: "24px 24px",
           }}
         />
+
+        <div className="absolute top-24 right-6 md:right-14 w-24 h-24 md:w-28 md:h-28 rounded-full border-2 border-dashed border-[#E8542E]/70 flex items-center justify-center -rotate-[10deg] opacity-80 pointer-events-none">
+          <span className="font-['IBM_Plex_Mono'] text-[9px] tracking-[0.15em] text-[#E8542E] text-center uppercase leading-tight px-2">
+            Site
+            <br />
+            Verified
+          </span>
+        </div>
+
         <div className="relative max-w-3xl">
-          <p className="font-mono text-[10px] tracking-[0.3em] text-[#C98A54] mb-4 uppercase">
-            Field log / all lots
+          <p className="font-['IBM_Plex_Mono'] text-[10px] tracking-[0.3em] text-[#E8542E] mb-4 uppercase">
+            [ Field log / all lots ]
           </p>
-          <h1 className="font-serif text-4xl md:text-6xl leading-[1.05] mb-6">
+          <h1 className="font-['Oswald'] font-semibold uppercase text-4xl md:text-6xl leading-[0.95] tracking-tight mb-6">
             Everything we've
             <br />
             put our name on.
           </h1>
-          <p className="text-[#F2EEE7]/70 leading-relaxed max-w-xl">
+          <p className="font-['IBM_Plex_Sans'] text-[#C7C2B8]/70 leading-relaxed max-w-xl">
             Every lot below went through the same four stages you saw on the way
             in — survey, design, build, deliver. Filter by type to see the ones
             closest to what you're planning.
@@ -239,13 +260,13 @@ export default function OurWork() {
             <button
               key={cat}
               onClick={() => setActiveCategory(cat)}
-              className={`text-[11px] font-mono tracking-[0.15em] uppercase px-4 py-2 rounded-full border transition-colors ${
+              className={`font-['IBM_Plex_Mono'] text-[11px] tracking-[0.15em] uppercase px-4 py-2 border transition-colors ${
                 activeCategory === cat
-                  ? "bg-[#C98A54] border-[#C98A54] text-[#0B0C0E]"
-                  : "border-white/15 text-[#F2EEE7]/60 hover:border-[#F2EEE7]/40 hover:text-[#F2EEE7]"
+                  ? "bg-[#E8542E] border-[#E8542E] text-[#121210]"
+                  : "border-[#565C5E]/50 text-[#C7C2B8]/60 hover:border-[#C7C2B8]/40 hover:text-[#C7C2B8]"
               }`}
             >
-              {cat}
+              [ {cat} ]
             </button>
           ))}
         </div>
@@ -257,33 +278,42 @@ export default function OurWork() {
           {filtered.map((project) => (
             <Reveal
               key={project.id}
-              className="group border border-white/10 rounded-sm p-4 bg-white/2 hover:border-[#C98A54]/40 transition-colors"
+              className="group relative border border-[#565C5E]/25 bg-[#1B1B17] hover:border-[#E8542E]/50 transition-colors pl-8 pr-5 py-5"
             >
-              <ProjectPlaceholder hue={project.hue} id={project.id} />
-              <div className="pt-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-mono text-[9px] tracking-[0.15em] text-[#F2EEE7]/40 uppercase">
-                    {project.coord}
-                  </span>
-                  <span className="font-mono text-[9px] tracking-[0.15em] text-[#C98A54] uppercase">
-                    {project.year}
-                  </span>
-                </div>
-                <h3 className="font-serif text-xl mb-1">{project.name}</h3>
-                <p className="text-[11px] font-mono tracking-[0.1em] text-[#F2EEE7]/50 uppercase mb-3">
-                  {project.category}
-                </p>
-                <p className="text-sm text-[#F2EEE7]/60 leading-relaxed">
-                  {project.blurb}
-                </p>
+              <CoreSample category={project.category} />
+              <Rivets />
+
+              <div className="flex items-center justify-between mb-3">
+                <span className="font-['IBM_Plex_Mono'] text-[9px] tracking-[0.15em] text-[#C7C2B8]/40 uppercase">
+                  PMT-{project.id}/{project.year.slice(-2)}
+                </span>
+                <span className="font-['IBM_Plex_Mono'] text-[9px] tracking-[0.15em] text-[#E8542E] uppercase">
+                  {project.year}
+                </span>
+              </div>
+              <h3 className="font-['Oswald'] uppercase tracking-tight text-xl mb-1">
+                {project.name}
+              </h3>
+              <p className="text-[11px] font-['IBM_Plex_Mono'] tracking-widest text-[#C7C2B8]/45 uppercase mb-3">
+                [ {project.category} ]
+              </p>
+              <p className="text-sm font-['IBM_Plex_Sans'] text-[#C7C2B8]/60 leading-relaxed">
+                {project.blurb}
+              </p>
+
+              <div className="mt-4 flex items-center gap-2 text-[10px] font-['IBM_Plex_Mono'] uppercase tracking-[0.15em] text-[#565C5E] group-hover:text-[#E8542E] transition-colors">
+                <span>View lot</span>
+                <span className="transition-transform group-hover:translate-x-1">
+                  →
+                </span>
               </div>
             </Reveal>
           ))}
         </div>
 
         {filtered.length === 0 && (
-          <p className="text-[#F2EEE7]/50 text-sm">
-            Nothing logged under this category yet.
+          <p className="font-['IBM_Plex_Sans'] text-[#C7C2B8]/50 text-sm">
+            No lots logged under this filter yet.
           </p>
         )}
       </section>
@@ -291,15 +321,15 @@ export default function OurWork() {
       {/* ============================ CONTACT CTA ============================ */}
       <section
         id="contact"
-        className="min-h-[60vh] flex flex-col items-center justify-center px-6 text-center border-t border-white/10"
+        className="relative min-h-[60vh] flex flex-col items-center justify-center px-6 text-center border-t border-[#565C5E]/25"
       >
-        <p className="font-mono text-[10px] tracking-[0.3em] text-[#C98A54] mb-4 uppercase">
-          Ready when you are
+        <p className="font-['IBM_Plex_Mono'] text-[10px] tracking-[0.3em] text-[#E8542E] mb-4 uppercase">
+          [ Ready when you are ]
         </p>
-        <h2 className="font-serif text-3xl md:text-4xl max-w-lg mb-6">
-          Your lot could be the next one logged here.
+        <h2 className="font-['Oswald'] uppercase font-semibold tracking-tight text-3xl md:text-4xl max-w-lg mb-6">
+          Your lot could be next in the log.
         </h2>
-        <button className="text-[11px] font-mono tracking-[0.2em] uppercase bg-[#F2EEE7] text-[#0B0C0E] px-6 py-3 rounded-full hover:bg-[#C98A54] transition-colors">
+        <button className="text-[11px] font-['IBM_Plex_Mono'] tracking-[0.2em] uppercase bg-[#C7C2B8] text-[#121210] px-6 py-3 border border-dashed border-transparent hover:bg-[#E8542E] hover:border-[#121210] transition-colors">
           Contact us
         </button>
       </section>

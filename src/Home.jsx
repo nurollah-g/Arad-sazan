@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import excavationImg from "./assets/stage-excavation.jpg";
 import foundationImg from "./assets/stage-foundation.jpg";
 import framingImg from "./assets/stage-framing.jpg";
@@ -61,7 +62,7 @@ const NAV_LINKS = [
   { label: "Home", path: "/" },
   { label: "About us", path: "/AboutUs" },
   { label: "Our work", path: "/OurWork" },
-  { label: "Contact", path: "#contact" },
+  { label: "Contact", path: "/Contact" },
 ];
 
 const STATS = [
@@ -581,9 +582,12 @@ export default function ConstructionHero() {
         <h2 className="font-serif text-3xl md:text-4xl max-w-lg mb-6">
           Let's build something worth the fog machine.
         </h2>
-        <button className="text-[11px] font-mono tracking-[0.2em] uppercase bg-[#F2EEE7] text-[#0B0C0E] px-6 py-3 rounded-full hover:bg-[#C98A54] transition-colors">
+        <Link
+          to="/Contact"
+          className="text-[11px] font-mono tracking-[0.2em] uppercase bg-[#F2EEE7] text-[#0B0C0E] px-6 py-3 rounded-full hover:bg-[#C98A54] transition-colors"
+        >
           Contact us
-        </button>
+        </Link>
       </section>
     </div>
   );

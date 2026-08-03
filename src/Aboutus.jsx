@@ -3,8 +3,8 @@ import { useEffect, useRef, useState } from "react";
 const NAV_LINKS = [
   { label: "Home", path: "/" },
   { label: "About us", path: "/AboutUs" },
-  { label: "Our work", path: "#" },
-  { label: "Contact", path: "#" },
+  { label: "Our work", path: "/OurWork" },
+  { label: "Contact", path: "/Contact" },
 ];
 
 const STATS = [
@@ -297,7 +297,7 @@ export default function AboutUs() {
           {STATS.map((s) => (
             <div
               key={s.label}
-              className="border border-white/10 rounded-sm px-6 py-8 bg-white/[0.02]"
+              className="border border-white/10 rounded-sm px-6 py-8 bg-white/2"
             >
               <p className="font-mono text-[9px] tracking-[0.2em] text-[#F2EEE7]/40 uppercase mb-3">
                 {s.coord}
@@ -333,7 +333,7 @@ export default function AboutUs() {
               whole pitch.
             </p>
           </Reveal>
-          <Reveal className="border border-white/10 rounded-sm p-4 bg-white/[0.02]">
+          <Reveal className="border border-white/10 rounded-sm p-4 bg-white/2">
             <BlueprintElevation />
           </Reveal>
         </div>
@@ -380,7 +380,7 @@ export default function AboutUs() {
           {TEAM.map((person) => (
             <Reveal
               key={person.name}
-              className="border border-white/10 rounded-sm p-6 bg-white/[0.02] hover:border-[#C98A54]/40 transition-colors"
+              className="border border-white/10 rounded-sm p-6 bg-white2 hover:border-[#C98A54]/40 transition-colors"
             >
               <div className="flex items-center justify-between mb-6">
                 <div className="h-11 w-11 rounded-full border border-[#C98A54]/50 flex items-center justify-center font-mono text-xs text-[#C98A54]">
