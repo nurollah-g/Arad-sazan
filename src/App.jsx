@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./Home";
 import AboutUs from "./Aboutus";
-import OurWork from "./Ourwork";
+import OurWork from "./OurWork";
 import Contact from "./Contact";
 import "./App.css";
 import ScrollToTop from "./ScrollToTop";

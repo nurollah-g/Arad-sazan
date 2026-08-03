@@ -319,7 +319,7 @@ function MobileMenu({ open, onClose }) {
 
   return (
     <div
-      className={`fixed inset-0 z-[60] bg-[#0B0C0E] md:hidden transition-[clip-path,opacity] duration-500 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-opacity motion-reduce:duration-300 ${
+      className={`fixed inset-0 z-60 bg-[#0B0C0E] md:hidden transition-[clip-path,opacity] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-opacity motion-reduce:duration-300 ${
         open
           ? "opacity-100 [clip-path:inset(0_0_0_0)] pointer-events-auto"
           : "opacity-0 [clip-path:inset(0_0_100%_0)] pointer-events-none"
@@ -501,16 +501,7 @@ export default function ConstructionHero() {
             <p className="text-sm text-[#F2EEE7]/70 leading-relaxed mb-6 max-w-sm">
               {activeStage.caption}
             </p>
-            {activeIndex === 0 && (
-              <div className="flex gap-3">
-                <button className="text-[11px] font-mono tracking-[0.2em] uppercase bg-[#F2EEE7] text-[#0B0C0E] px-5 py-3 rounded-full hover:bg-[#C98A54] transition-colors">
-                  Learn more
-                </button>
-                <button className="text-[11px] font-mono tracking-[0.2em] uppercase border border-[#F2EEE7]/40 px-5 py-3 rounded-full hover:border-[#F2EEE7] transition-colors">
-                  Contact us
-                </button>
-              </div>
-            )}
+            {activeIndex === 0 && <div className="flex gap-3"></div>}
           </div>
 
           {/* Scroll-to-explore prompt, only at the very start */}

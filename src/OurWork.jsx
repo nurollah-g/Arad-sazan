@@ -123,7 +123,7 @@ function ProjectPhoto({ src, alt }) {
         src={src}
         alt={alt}
         loading="lazy"
-        className="w-full h-full object-cover grayscale-[30%] contrast-[1.05] group-hover:grayscale-0 transition-[filter] duration-500"
+        className="w-full h-full object-cover grayscale-30 contrast-[1.05] group-hover:grayscale-0 transition-[filter] duration-500"
       />
       <div
         className="absolute inset-0 pointer-events-none"
@@ -150,7 +150,7 @@ function MobileMenu({ open, onClose }) {
 
   return (
     <div
-      className={`fixed inset-0 z-[60] bg-[#0B0C0E] md:hidden transition-[clip-path,opacity] duration-500 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-opacity motion-reduce:duration-300 ${
+      className={`fixed inset-0 z-60 bg-[#0B0C0E] md:hidden transition-[clip-path,opacity] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-opacity motion-reduce:duration-300 ${
         open
           ? "opacity-100 [clip-path:inset(0_0_0_0)] pointer-events-auto"
           : "opacity-0 [clip-path:inset(0_0_100%_0)] pointer-events-none"

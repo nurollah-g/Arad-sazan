@@ -233,7 +233,7 @@ function MobileMenu({ open, onClose, currentPath }) {
 
   return (
     <div
-      className={`fixed inset-0 z-[60] bg-[#0B0C0E] md:hidden transition-[clip-path,opacity] duration-500 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-opacity motion-reduce:duration-300 ${
+      className={`fixed inset-0 z-60] bg-[#0B0C0E] md:hidden transition-[clip-path,opacity] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-opacity motion-reduce:duration-300 ${
         open
           ? "opacity-100 [clip-path:inset(0_0_0_0)] pointer-events-auto"
           : "opacity-0 [clip-path:inset(0_0_100%_0)] pointer-events-none"
