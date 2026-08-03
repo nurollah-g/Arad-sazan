@@ -1,8 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Home from "./Home";
-import AboutUs from "./Aboutus";
-import OurWork from "./OurWork";
-import Contact from "./Contact";
+import Home from "./pages/Home";
+import AboutUs from "./pages/Aboutus";
+import OurWork from "./pages/OurWork";
+import Contact from "./pages/Contact";
 import "./App.css";
 import ScrollToTop from "./ScrollToTop";
 
