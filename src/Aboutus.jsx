@@ -154,7 +154,8 @@ function BlueprintElevation() {
         width="399"
         height="299"
         stroke="#F2EEE7"
-        strokeOpacity="0.12"
+        strokeOpacit
+        y="0.12"
       />
       {Array.from({ length: 9 }).map((_, i) => (
         <line
@@ -218,8 +219,110 @@ function BlueprintElevation() {
   );
 }
 
+// Full-screen mobile nav — same pattern used on Home: always mounted,
+// animated purely off the `open` prop so there's no state/ref to sync
+// in an effect (keeps it clean under the stricter react-hooks lints).
+function MobileMenu({ open, onClose, currentPath }) {
+  useEffect(() => {
+    if (!open) return;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
+  return (
+    <div
+      className={`fixed inset-0 z-[60] bg-[#0B0C0E] md:hidden transition-[clip-path,opacity] duration-500 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-opacity motion-reduce:duration-300 ${
+        open
+          ? "opacity-100 [clip-path:inset(0_0_0_0)] pointer-events-auto"
+          : "opacity-0 [clip-path:inset(0_0_100%_0)] pointer-events-none"
+      }`}
+      role="dialog"
+      aria-modal="true"
+      aria-hidden={!open}
+      aria-label="Site menu"
+    >
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.06]"
+        style={{
+          backgroundImage:
+            "linear-gradient(#F2EEE7 1px, transparent 1px), linear-gradient(90deg, #F2EEE7 1px, transparent 1px)",
+          backgroundSize: "40px 40px",
+        }}
+      />
+
+      <div className="relative h-full flex flex-col px-6 pt-6 pb-10">
+        <div className="flex items-center justify-between mb-14">
+          <span className="font-mono text-[10px] tracking-[0.3em] uppercase text-[#F2EEE7]/40">
+            Menu / all pages
+          </span>
+          <button
+            onClick={onClose}
+            aria-label="Close menu"
+            tabIndex={open ? 0 : -1}
+            className="relative w-9 h-9 flex items-center justify-center text-[#F2EEE7]"
+          >
+            <span className="absolute w-5 h-[1.5px] bg-current rotate-45" />
+            <span className="absolute w-5 h-[1.5px] bg-current -rotate-45" />
+          </button>
+        </div>
+
+        <nav className="flex-1 flex flex-col justify-center">
+          {NAV_LINKS.map((link, i) => (
+            <a
+              key={link.label}
+              href={link.path}
+              onClick={onClose}
+              tabIndex={open ? 0 : -1}
+              className={`group flex items-baseline gap-4 py-4 border-b border-white/10 transition-all duration-500 ease-out motion-reduce:transition-none motion-reduce:transform-none ${
+                open ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+              }`}
+              style={{
+                transitionDelay: open ? `${120 + i * 70}ms` : "0ms",
+              }}
+            >
+              <span
+                className={`font-mono text-[11px] ${
+                  link.path === currentPath
+                    ? "text-[#C98A54]"
+                    : "text-[#C98A54]/50"
+                }`}
+              >
+                0{i + 1}
+              </span>
+              <span
+                className={`font-serif text-3xl transition-colors ${
+                  link.path === currentPath
+                    ? "text-[#C98A54]"
+                    : "group-active:text-[#C98A54]"
+                }`}
+              >
+                {link.label}
+              </span>
+            </a>
+          ))}
+        </nav>
+
+        <a
+          href="#contact"
+          onClick={onClose}
+          tabIndex={open ? 0 : -1}
+          className={`text-[11px] font-mono tracking-[0.2em] uppercase border border-[#C98A54]/60 text-[#C98A54] px-5 py-4 rounded-full text-center transition-all duration-500 ease-out motion-reduce:transition-none motion-reduce:transform-none ${
+            open ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+          }`}
+          style={{ transitionDelay: open ? "400ms" : "0ms" }}
+        >
+          Get a consultation
+        </a>
+      </div>
+    </div>
+  );
+}
+
 export default function AboutUs() {
   const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -247,7 +350,7 @@ export default function AboutUs() {
               key={link.label}
               href={link.path}
               className={`text-[13px] tracking-wide transition-colors ${
-                link === "About us"
+                link.label === "About us"
                   ? "text-[#C98A54]"
                   : "text-[#F2EEE7]/70 hover:text-[#F2EEE7]"
               }`}
@@ -258,14 +361,30 @@ export default function AboutUs() {
         </div>
         <a
           href="#contact"
-          className="text-[11px] font-mono tracking-[0.2em] uppercase border border-[#C98A54]/60 text-[#C98A54] px-4 py-2 rounded-full hover:bg-[#C98A54] hover:text-[#0B0C0E] transition-colors"
+          className="hidden md:inline-block text-[11px] font-mono tracking-[0.2em] uppercase border border-[#C98A54]/60 text-[#C98A54] px-4 py-2 rounded-full hover:bg-[#C98A54] hover:text-[#0B0C0E] transition-colors"
         >
           Get a consulation
         </a>
+
+        {/* Mobile hamburger — asymmetric bars (cream + amber), matches Home */}
+        <button
+          onClick={() => setMobileMenuOpen(true)}
+          aria-label="Open menu"
+          className="md:hidden flex flex-col items-end gap-1.5 w-8 h-8 justify-center"
+        >
+          <span className="block h-[1.5px] w-6 bg-[#F2EEE7]" />
+          <span className="block h-[1.5px] w-4 bg-[#C98A54]" />
+        </button>
       </nav>
 
+      <MobileMenu
+        open={mobileMenuOpen}
+        onClose={() => setMobileMenuOpen(false)}
+        currentPath="/AboutUs"
+      />
+
       {/* ============================ HERO ============================ */}
-      <section className="relative pt-40 pb-24 px-6 md:px-14 overflow-hidden">
+      <section className="relative pt-32 sm:pt-36 md:pt-40 pb-16 sm:pb-20 md:pb-24 px-6 md:px-14 overflow-hidden">
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.06]"
           style={{
@@ -274,16 +393,17 @@ export default function AboutUs() {
             backgroundSize: "40px 40px",
           }}
         />
+
         <div className="relative max-w-3xl">
           <p className="font-mono text-[10px] tracking-[0.3em] text-[#C98A54] mb-4 uppercase">
             Company dossier / est. 2014
           </p>
-          <h1 className="font-serif text-4xl md:text-6xl leading-[1.05] mb-6">
+          <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl leading-[1.05] mb-6">
             We're not decorators.
             <br />
             We're your rep on site.
           </h1>
-          <p className="text-[#F2EEE7]/70 leading-relaxed max-w-xl">
+          <p className="text-[#F2EEE7]/70 leading-relaxed max-w-xl text-[15px] sm:text-base">
             AradSazan started as three people who were tired of watching good
             renders die on a bad site. We build the same drawing we sell you —
             and we stand on the lot until it matches.
@@ -292,8 +412,8 @@ export default function AboutUs() {
       </section>
 
       {/* ============================ STATS ============================ */}
-      <section className="px-6 md:px-14 pb-24">
-        <Reveal className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <section className="px-6 md:px-14 pb-20 sm:pb-24">
+        <Reveal className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {STATS.map((s) => (
             <div
               key={s.label}
@@ -313,13 +433,13 @@ export default function AboutUs() {
       </section>
 
       {/* ============================ PHILOSOPHY ============================ */}
-      <section className="px-6 md:px-14 pb-28 border-t border-white/10 pt-20">
-        <div className="grid md:grid-cols-2 gap-14 items-center max-w-6xl mx-auto">
+      <section className="px-6 md:px-14 pb-20 sm:pb-24 md:pb-28 border-t border-white/10 pt-16 sm:pt-20">
+        <div className="grid md:grid-cols-2 gap-10 sm:gap-14 items-center max-w-6xl mx-auto">
           <Reveal>
             <p className="font-mono text-[10px] tracking-[0.3em] text-[#C98A54] mb-4 uppercase">
               Philosophy
             </p>
-            <h2 className="font-serif text-3xl md:text-4xl leading-tight mb-6">
+            <h2 className="font-serif text-3xl sm:text-4xl leading-tight mb-6">
               Calling us a design firm is a disservice to both of us.
             </h2>
             <p className="text-[#F2EEE7]/70 leading-relaxed mb-4">
@@ -340,16 +460,16 @@ export default function AboutUs() {
       </section>
 
       {/* ============================ PROCESS ============================ */}
-      <section className="px-6 md:px-14 pb-28 border-t border-white/10 pt-20">
-        <Reveal className="max-w-2xl mb-14">
+      <section className="px-6 md:px-14 pb-20 sm:pb-24 md:pb-28 border-t border-white/10 pt-16 sm:pt-20">
+        <Reveal className="max-w-2xl mb-10 sm:mb-14">
           <p className="font-mono text-[10px] tracking-[0.3em] text-[#C98A54] mb-4 uppercase">
             How the partnership runs
           </p>
-          <h2 className="font-serif text-3xl md:text-4xl leading-tight">
+          <h2 className="font-serif text-3xl sm:text-4xl leading-tight">
             Four stages. One point of contact.
           </h2>
         </Reveal>
-        <div className="grid md:grid-cols-2 gap-8 max-w-5xl">
+        <div className="grid sm:grid-cols-2 gap-8 max-w-5xl">
           {PROCESS.map((step) => (
             <Reveal key={step.n} className="border-t border-white/10 pt-6">
               <div className="flex items-baseline gap-4 mb-3">
@@ -367,12 +487,12 @@ export default function AboutUs() {
       </section>
 
       {/* ============================ TEAM ============================ */}
-      <section className="px-6 md:px-14 pb-28 border-t border-white/10 pt-20">
-        <Reveal className="max-w-2xl mb-14">
+      <section className="px-6 md:px-14 pb-20 sm:pb-24 md:pb-28 border-t border-white/10 pt-16 sm:pt-20">
+        <Reveal className="max-w-2xl mb-10 sm:mb-14">
           <p className="font-mono text-[10px] tracking-[0.3em] text-[#C98A54] mb-4 uppercase">
             Personnel on record
           </p>
-          <h2 className="font-serif text-3xl md:text-4xl leading-tight">
+          <h2 className="font-serif text-3xl sm:text-4xl leading-tight">
             The people who answer the phone.
           </h2>
         </Reveal>
@@ -380,7 +500,7 @@ export default function AboutUs() {
           {TEAM.map((person) => (
             <Reveal
               key={person.name}
-              className="border border-white/10 rounded-sm p-6 bg-white2 hover:border-[#C98A54]/40 transition-colors"
+              className="border border-white/10 rounded-sm p-6 bg-white/2 hover:border-[#C98A54]/40 transition-colors"
             >
               <div className="flex items-center justify-between mb-6">
                 <div className="h-11 w-11 rounded-full border border-[#C98A54]/50 flex items-center justify-center font-mono text-xs text-[#C98A54]">
@@ -410,7 +530,7 @@ export default function AboutUs() {
         <p className="font-mono text-[10px] tracking-[0.3em] text-[#C98A54] mb-4 uppercase">
           Ready when you are
         </p>
-        <h2 className="font-serif text-3xl md:text-4xl max-w-lg mb-6">
+        <h2 className="font-serif text-3xl sm:text-4xl max-w-lg mb-6">
           Let's put your name on the coordinate tag.
         </h2>
         <button className="text-[11px] font-mono tracking-[0.2em] uppercase bg-[#F2EEE7] text-[#0B0C0E] px-6 py-3 rounded-full hover:bg-[#C98A54] transition-colors">

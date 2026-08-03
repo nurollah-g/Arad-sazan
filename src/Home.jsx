@@ -303,9 +303,98 @@ function BlueprintElevation() {
   );
 }
 
+// Full-screen mobile nav. Mounted only while open/closing so the
+// enter/exit transition can run, then unmounts to keep the DOM clean.
+function MobileMenu({ open, onClose }) {
+  // Kept mounted at all times; visibility and motion are driven purely by
+  // CSS transitions keyed on `open`. No local state needed for the
+  // animation, so there's nothing to sync in an effect or a ref.
+  useEffect(() => {
+    if (!open) return;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
+  return (
+    <div
+      className={`fixed inset-0 z-[60] bg-[#0B0C0E] md:hidden transition-[clip-path,opacity] duration-500 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-opacity motion-reduce:duration-300 ${
+        open
+          ? "opacity-100 [clip-path:inset(0_0_0_0)] pointer-events-auto"
+          : "opacity-0 [clip-path:inset(0_0_100%_0)] pointer-events-none"
+      }`}
+      role="dialog"
+      aria-modal="true"
+      aria-hidden={!open}
+      aria-label="Site menu"
+    >
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.06]"
+        style={{
+          backgroundImage:
+            "linear-gradient(#F2EEE7 1px, transparent 1px), linear-gradient(90deg, #F2EEE7 1px, transparent 1px)",
+          backgroundSize: "40px 40px",
+        }}
+      />
+
+      <div className="relative h-full flex flex-col px-6 pt-6 pb-10">
+        <div className="flex items-center justify-between mb-14">
+          <span className="font-mono text-[10px] tracking-[0.3em] uppercase text-[#F2EEE7]/40">
+            Menu / all pages
+          </span>
+          <button
+            onClick={onClose}
+            aria-label="Close menu"
+            className="relative w-9 h-9 flex items-center justify-center text-[#F2EEE7]"
+          >
+            <span className="absolute w-5 h-[1.5px] bg-current rotate-45" />
+            <span className="absolute w-5 h-[1.5px] bg-current -rotate-45" />
+          </button>
+        </div>
+
+        <nav className="flex-1 flex flex-col justify-center">
+          {NAV_LINKS.map((link, i) => (
+            <a
+              key={link.label}
+              href={link.path}
+              onClick={onClose}
+              tabIndex={open ? 0 : -1}
+              className={`group flex items-baseline gap-4 py-4 border-b border-white/10 transition-all duration-500 ease-out motion-reduce:transition-none motion-reduce:transform-none ${
+                open ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+              }`}
+              style={{ transitionDelay: open ? `${120 + i * 70}ms` : "0ms" }}
+            >
+              <span className="font-mono text-[11px] text-[#C98A54]">
+                0{i + 1}
+              </span>
+              <span className="font-serif text-3xl group-active:text-[#C98A54] transition-colors">
+                {link.label}
+              </span>
+            </a>
+          ))}
+        </nav>
+
+        <a
+          href="#contact"
+          onClick={onClose}
+          tabIndex={open ? 0 : -1}
+          className={`text-[11px] font-mono tracking-[0.2em] uppercase border border-[#C98A54]/60 text-[#C98A54] px-5 py-4 rounded-full text-center transition-all duration-500 ease-out motion-reduce:transition-none motion-reduce:transform-none ${
+            open ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+          }`}
+          style={{ transitionDelay: open ? "400ms" : "0ms" }}
+        >
+          Get a consultation
+        </a>
+      </div>
+    </div>
+  );
+}
+
 export default function ConstructionHero() {
   const scrollRef = useRef(null);
   const progress = useScrollProgress(scrollRef);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const stageCount = STAGES.length;
   const rawIndex = progress * (stageCount - 1);
@@ -338,9 +427,6 @@ export default function ConstructionHero() {
             alt="LOGO"
             className="h-12 md:h-18 w-auto object-contain "
           />
-          {/* <span className="font-mono text-[14px] tracking-[0.25em] uppercase text-[#F2EEE7]/80">
-            AradSazan
-          </span> */}
         </div>
         <div className="hidden md:flex items-center gap-8">
           {NAV_LINKS.map((link) => (
@@ -354,12 +440,27 @@ export default function ConstructionHero() {
           ))}
         </div>
         <a
-          href="#contact"
-          className="text-[11px] font-mono tracking-[0.2em] uppercase border border-[#C98A54]/60 text-[#C98A54] px-4 py-2 rounded-full hover:bg-[#C98A54] hover:text-[#0B0C0E] transition-colors"
+          href="/contact"
+          className="hidden md:inline-block text-[11px] font-mono tracking-[0.2em] uppercase border border-[#C98A54]/60 text-[#C98A54] px-4 py-2 rounded-full hover:bg-[#C98A54] hover:text-[#0B0C0E] transition-colors"
         >
           Get a consulation
         </a>
+
+        {/* Mobile hamburger — asymmetric bars (cream + amber) instead of a generic three-line icon */}
+        <button
+          onClick={() => setMobileMenuOpen(true)}
+          aria-label="Open menu"
+          className="md:hidden flex flex-col items-end gap-1.5 w-8 h-8 justify-center"
+        >
+          <span className="block h-[1.5px] w-6 bg-[#F2EEE7]" />
+          <span className="block h-[1.5px] w-4 bg-[#C98A54]" />
+        </button>
       </nav>
+
+      <MobileMenu
+        open={mobileMenuOpen}
+        onClose={() => setMobileMenuOpen(false)}
+      />
 
       {/* ==================== SCROLL-SCRUBBED HERO ==================== */}
       <section ref={scrollRef} className="relative" style={{ height: "500vh" }}>

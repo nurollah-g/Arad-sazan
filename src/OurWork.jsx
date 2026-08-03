@@ -18,6 +18,8 @@ const PROJECTS = [
     coord: "LOT 04 / QOM",
     blurb:
       "A four-stage build from raw excavation to a finished envelope, documented at every phase.",
+    hue: "#C98A54",
+    photo: "/images/images.webp",
   },
   {
     id: "02",
@@ -27,6 +29,8 @@ const PROJECTS = [
     coord: "LOT 11 / CBD",
     blurb:
       "Full mechanical rough-in and glazing package delivered to render-grade finish.",
+    hue: "#8B9A8C",
+    photo: "/images/office.webp",
   },
   {
     id: "03",
@@ -36,6 +40,8 @@ const PROJECTS = [
     coord: "LOT 07 / BAHARESTAN",
     blurb:
       "Concept-to-elevation design work paired with in-house procurement and build.",
+    hue: "#C98A54",
+    photo: "/images/townhouse.webp",
   },
   {
     id: "04",
@@ -45,6 +51,8 @@ const PROJECTS = [
     coord: "LOT 02 / SAFAIYEH",
     blurb:
       "Cladding and storefront glazing executed to the same standard as the original render.",
+    hue: "#8B9A8C",
+    photo: "/images/retail.webp",
   },
   {
     id: "05",
@@ -54,6 +62,8 @@ const PROJECTS = [
     coord: "LOT 09 / FERDOWS",
     blurb:
       "Structural rework behind a full interior and envelope refresh, on an occupied site.",
+    hue: "#A8763F",
+    photo: "/images/renovation.webp",
   },
   {
     id: "06",
@@ -63,30 +73,10 @@ const PROJECTS = [
     coord: "LOT 15 / AZADI",
     blurb:
       "A full rooftop level added without touching the building's working ground floor.",
+    hue: "#A8763F",
+    photo: "/images/addition.webp",
   },
 ];
-
-// material composition per category — like a geological core sample from the site
-const CORE_BANDS = {
-  Residential: [
-    { color: "#C7C2B8", weight: 3 },
-    { color: "#8C6239", weight: 2 },
-    { color: "#4A4F52", weight: 2 },
-    { color: "#E8542E", weight: 1 },
-  ],
-  Commercial: [
-    { color: "#4A4F52", weight: 3 },
-    { color: "#6E7476", weight: 2 },
-    { color: "#C7C2B8", weight: 2 },
-    { color: "#E8542E", weight: 1 },
-  ],
-  Renovation: [
-    { color: "#8C6239", weight: 2 },
-    { color: "#E8542E", weight: 2 },
-    { color: "#4A4F52", weight: 3 },
-    { color: "#C7C2B8", weight: 1 },
-  ],
-};
 
 function useReveal() {
   const ref = useRef(null);
@@ -111,13 +101,14 @@ function useReveal() {
   return [ref, visible];
 }
 
-function Reveal({ as: Tag = "div", className = "", children }) {
+function Reveal({ as: Tag = "div", className = "", delay = 0, children }) {
   const [ref, visible] = useReveal();
   return (
     <Tag
       ref={ref}
+      style={{ transitionDelay: visible ? `${delay}ms` : "0ms" }}
       className={`${className} transition-all duration-700 ease-out motion-reduce:transition-none motion-reduce:transform-none ${
-        visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+        visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
       }`}
     >
       {children}
@@ -125,46 +116,116 @@ function Reveal({ as: Tag = "div", className = "", children }) {
   );
 }
 
-function CoreSample({ category }) {
-  const bands = CORE_BANDS[category] || CORE_BANDS.Residential;
+function ProjectPhoto({ src, alt }) {
   return (
-    <div className="absolute left-0 top-0 bottom-0 w-3 flex flex-col overflow-hidden border-r border-black/40">
-      {bands.map((b, i) => (
-        <div
-          key={i}
-          style={{ flexGrow: b.weight, background: b.color }}
-          className="relative"
-        >
-          <div
-            className="absolute inset-0 opacity-10"
-            style={{
-              backgroundImage:
-                "repeating-linear-gradient(0deg, transparent, transparent 3px, #000 3px, #000 4px)",
-            }}
-          />
-        </div>
-      ))}
+    <div className="relative w-full aspect-4/3 overflow-hidden border-b border-[#565C5E]/25">
+      <img
+        src={src}
+        alt={alt}
+        loading="lazy"
+        className="w-full h-full object-cover grayscale-[30%] contrast-[1.05] group-hover:grayscale-0 transition-[filter] duration-500"
+      />
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "linear-gradient(180deg, rgba(18,18,16,0) 60%, rgba(18,18,16,0.55) 100%)",
+        }}
+      />
     </div>
   );
 }
 
-function Rivets() {
-  const dot = "absolute w-1 h-1 rounded-full bg-[#C7C2B8]/15";
-  return (
-    <>
-      <span className={`${dot} top-1.5 right-1.5`} />
-      <span
-        className={`$
+function MobileMenu({ open, onClose }) {
+  // Kept mounted at all times; visibility and motion are driven purely by
+  // CSS transitions keyed on `open`. No local state needed for the
+  // animation, so there's nothing to sync in an effect or a ref.
+  useEffect(() => {
+    if (!open) return;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [open]);
 
-{dot} bottom-1.5 right-1.5`}
+  return (
+    <div
+      className={`fixed inset-0 z-[60] bg-[#0B0C0E] md:hidden transition-[clip-path,opacity] duration-500 [transition-timing-function:cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-opacity motion-reduce:duration-300 ${
+        open
+          ? "opacity-100 [clip-path:inset(0_0_0_0)] pointer-events-auto"
+          : "opacity-0 [clip-path:inset(0_0_100%_0)] pointer-events-none"
+      }`}
+      role="dialog"
+      aria-modal="true"
+      aria-hidden={!open}
+      aria-label="Site menu"
+    >
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.06]"
+        style={{
+          backgroundImage:
+            "linear-gradient(#F2EEE7 1px, transparent 1px), linear-gradient(90deg, #F2EEE7 1px, transparent 1px)",
+          backgroundSize: "40px 40px",
+        }}
       />
-    </>
+
+      <div className="relative h-full flex flex-col px-6 pt-6 pb-10">
+        <div className="flex items-center justify-between mb-14">
+          <span className="font-mono text-[10px] tracking-[0.3em] uppercase text-[#F2EEE7]/40">
+            Menu / all pages
+          </span>
+          <button
+            onClick={onClose}
+            aria-label="Close menu"
+            className="relative w-9 h-9 flex items-center justify-center text-[#F2EEE7]"
+          >
+            <span className="absolute w-5 h-[1.5px] bg-current rotate-45" />
+            <span className="absolute w-5 h-[1.5px] bg-current -rotate-45" />
+          </button>
+        </div>
+
+        <nav className="flex-1 flex flex-col justify-center">
+          {NAV_LINKS.map((link, i) => (
+            <a
+              key={link.label}
+              href={link.path}
+              onClick={onClose}
+              tabIndex={open ? 0 : -1}
+              className={`group flex items-baseline gap-4 py-4 border-b border-white/10 transition-all duration-500 ease-out motion-reduce:transition-none motion-reduce:transform-none ${
+                open ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+              }`}
+              style={{ transitionDelay: open ? `${120 + i * 70}ms` : "0ms" }}
+            >
+              <span className="font-mono text-[11px] text-[#C98A54]">
+                0{i + 1}
+              </span>
+              <span className="font-serif text-3xl group-active:text-[#C98A54] transition-colors">
+                {link.label}
+              </span>
+            </a>
+          ))}
+        </nav>
+
+        <a
+          href="#contact"
+          onClick={onClose}
+          tabIndex={open ? 0 : -1}
+          className={`text-[11px] font-mono tracking-[0.2em] uppercase border border-[#C98A54]/60 text-[#C98A54] px-5 py-4 rounded-full text-center transition-all duration-500 ease-out motion-reduce:transition-none motion-reduce:transform-none ${
+            open ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+          }`}
+          style={{ transitionDelay: open ? "400ms" : "0ms" }}
+        >
+          Get a consultation
+        </a>
+      </div>
+    </div>
   );
 }
 
 export default function OurWork() {
   const [scrolled, setScrolled] = useState(false);
   const [activeCategory, setActiveCategory] = useState("All");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -179,20 +240,16 @@ export default function OurWork() {
       : PROJECTS.filter((p) => p.category === activeCategory);
 
   return (
-    <div className="bg-[#121210] text-[#C7C2B8] min-h-screen">
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap');
-      `}</style>
-
+    <div className="bg-[#0B0C0E] text-[#F2EEE7] min-h-screen">
       {/* ============================ NAV ============================ */}
       <nav
-        className={`fixed top-0 inset-x-0 z-50 flex items-center justify-between px-6 md:px-10 py-4 transition-all duration-500 border-b-2 ${
+        className={`fixed top-0 inset-x-0 z-50 flex items-center justify-between px-6 md:px-10 py-4 transition-all duration-500 ${
           scrolled
-            ? "bg-[#0E0E0C] border-[#E8542E]/60"
-            : "bg-transparent border-transparent"
+            ? "bg-black/20 backdrop-blur-sm border-b border-white/10"
+            : "bg-transparent border-b border-transparent"
         }`}
       >
-        <span className="font-['IBM_Plex_Mono'] text-[13px] tracking-[0.25em] uppercase text-[#C7C2B8]/80">
+        <span className="font-mono text-[13px] tracking-[0.25em] uppercase text-[#F2EEE7]/80">
           AradSazan
         </span>
         <div className="hidden md:flex items-center gap-8">
@@ -200,10 +257,10 @@ export default function OurWork() {
             <a
               key={link.label}
               href={link.path}
-              className={`font-['IBM_Plex_Sans'] text-[13px] tracking-wide transition-colors ${
+              className={`text-[13px] tracking-wide transition-colors ${
                 link.label === "Our work"
-                  ? "text-[#E8542E]"
-                  : "text-[#C7C2B8]/70 hover:text-[#C7C2B8]"
+                  ? "text-[#C98A54]"
+                  : "text-[#F2EEE7]/70 hover:text-[#F2EEE7]"
               }`}
             >
               {link.label}
@@ -212,40 +269,46 @@ export default function OurWork() {
         </div>
         <a
           href="#contact"
-          className="text-[11px] font-['IBM_Plex_Mono'] tracking-[0.2em] uppercase border border-dashed border-[#E8542E]/70 text-[#E8542E] px-4 py-2 hover:bg-[#E8542E] hover:text-[#121210] hover:border-solid transition-colors"
+          className="hidden md:inline-block text-[11px] font-mono tracking-[0.2em] uppercase border border-[#C98A54]/60 text-[#C98A54] px-4 py-2 rounded-full hover:bg-[#C98A54] hover:text-[#0B0C0E] transition-colors"
         >
-          Request quote
+          Get a consulation
         </a>
+
+        <button
+          onClick={() => setMobileMenuOpen(true)}
+          aria-label="Open menu"
+          className="md:hidden flex flex-col items-end gap-1.5 w-8 h-8 justify-center"
+        >
+          <span className="block h-[1.5px] w-6 bg-[#F2EEE7]" />
+          <span className="block h-[1.5px] w-4 bg-[#C98A54]" />
+        </button>
       </nav>
+
+      <MobileMenu
+        open={mobileMenuOpen}
+        onClose={() => setMobileMenuOpen(false)}
+      />
 
       {/* ============================ HERO ============================ */}
       <section className="relative pt-40 pb-16 px-6 md:px-14 overflow-hidden">
         <div
-          className="pointer-events-none absolute inset-0 opacity-[0.05]"
+          className="pointer-events-none absolute inset-0 opacity-[0.06]"
           style={{
-            backgroundImage: "radial-gradient(#C7C2B8 1px, transparent 1px)",
-            backgroundSize: "24px 24px",
+            backgroundImage:
+              "linear-gradient(#F2EEE7 1px, transparent 1px), linear-gradient(90deg, #F2EEE7 1px, transparent 1px)",
+            backgroundSize: "40px 40px",
           }}
         />
-
-        <div className="absolute top-24 right-6 md:right-14 w-24 h-24 md:w-28 md:h-28 rounded-full border-2 border-dashed border-[#E8542E]/70 flex items-center justify-center -rotate-[10deg] opacity-80 pointer-events-none">
-          <span className="font-['IBM_Plex_Mono'] text-[9px] tracking-[0.15em] text-[#E8542E] text-center uppercase leading-tight px-2">
-            Site
-            <br />
-            Verified
-          </span>
-        </div>
-
         <div className="relative max-w-3xl">
-          <p className="font-['IBM_Plex_Mono'] text-[10px] tracking-[0.3em] text-[#E8542E] mb-4 uppercase">
-            [ Field log / all lots ]
+          <p className="font-mono text-[10px] tracking-[0.3em] text-[#C98A54] mb-4 uppercase">
+            Field log / all lots
           </p>
-          <h1 className="font-['Oswald'] font-semibold uppercase text-4xl md:text-6xl leading-[0.95] tracking-tight mb-6">
+          <h1 className="font-serif text-4xl md:text-6xl leading-[1.05] mb-6">
             Everything we've
             <br />
             put our name on.
           </h1>
-          <p className="font-['IBM_Plex_Sans'] text-[#C7C2B8]/70 leading-relaxed max-w-xl">
+          <p className="text-[#F2EEE7]/70 leading-relaxed max-w-xl">
             Every lot below went through the same four stages you saw on the way
             in — survey, design, build, deliver. Filter by type to see the ones
             closest to what you're planning.
@@ -260,13 +323,13 @@ export default function OurWork() {
             <button
               key={cat}
               onClick={() => setActiveCategory(cat)}
-              className={`font-['IBM_Plex_Mono'] text-[11px] tracking-[0.15em] uppercase px-4 py-2 border transition-colors ${
+              className={`text-[11px] font-mono tracking-[0.15em] uppercase px-4 py-2 rounded-full border transition-colors ${
                 activeCategory === cat
-                  ? "bg-[#E8542E] border-[#E8542E] text-[#121210]"
-                  : "border-[#565C5E]/50 text-[#C7C2B8]/60 hover:border-[#C7C2B8]/40 hover:text-[#C7C2B8]"
+                  ? "bg-[#C98A54] border-[#C98A54] text-[#0B0C0E]"
+                  : "border-white/15 text-[#F2EEE7]/60 hover:border-[#F2EEE7]/40 hover:text-[#F2EEE7]"
               }`}
             >
-              [ {cat} ]
+              {cat}
             </button>
           ))}
         </div>
@@ -275,45 +338,37 @@ export default function OurWork() {
       {/* ============================ PROJECT GRID ============================ */}
       <section className="px-6 md:px-14 pb-28">
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filtered.map((project) => (
+          {filtered.map((project, index) => (
             <Reveal
               key={project.id}
-              className="group relative border border-[#565C5E]/25 bg-[#1B1B17] hover:border-[#E8542E]/50 transition-colors pl-8 pr-5 py-5"
+              delay={(index % 3) * 100}
+              className="group border border-white/10 rounded-sm p-4 bg-white/2 hover:border-[#C98A54]/40 transition-colors"
             >
-              <CoreSample category={project.category} />
-              <Rivets />
-
-              <div className="flex items-center justify-between mb-3">
-                <span className="font-['IBM_Plex_Mono'] text-[9px] tracking-[0.15em] text-[#C7C2B8]/40 uppercase">
-                  PMT-{project.id}/{project.year.slice(-2)}
-                </span>
-                <span className="font-['IBM_Plex_Mono'] text-[9px] tracking-[0.15em] text-[#E8542E] uppercase">
-                  {project.year}
-                </span>
-              </div>
-              <h3 className="font-['Oswald'] uppercase tracking-tight text-xl mb-1">
-                {project.name}
-              </h3>
-              <p className="text-[11px] font-['IBM_Plex_Mono'] tracking-widest text-[#C7C2B8]/45 uppercase mb-3">
-                [ {project.category} ]
-              </p>
-              <p className="text-sm font-['IBM_Plex_Sans'] text-[#C7C2B8]/60 leading-relaxed">
-                {project.blurb}
-              </p>
-
-              <div className="mt-4 flex items-center gap-2 text-[10px] font-['IBM_Plex_Mono'] uppercase tracking-[0.15em] text-[#565C5E] group-hover:text-[#E8542E] transition-colors">
-                <span>View lot</span>
-                <span className="transition-transform group-hover:translate-x-1">
-                  →
-                </span>
+              <ProjectPhoto src={project.photo} alt={project.name} />
+              <div className="px-5 py-5">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-mono text-[9px] tracking-[0.15em] text-[#F2EEE7]/40 uppercase">
+                    {project.coord}
+                  </span>
+                  <span className="font-mono text-[9px] tracking-[0.15em] text-[#C98A54] uppercase">
+                    {project.year}
+                  </span>
+                </div>
+                <h3 className="font-serif text-xl mb-1">{project.name}</h3>
+                <p className="text-[11px] font-mono tracking-widest text-[#F2EEE7]/50 uppercase mb-3">
+                  {project.category}
+                </p>
+                <p className="text-sm text-[#F2EEE7]/60 leading-relaxed">
+                  {project.blurb}
+                </p>
               </div>
             </Reveal>
           ))}
         </div>
 
         {filtered.length === 0 && (
-          <p className="font-['IBM_Plex_Sans'] text-[#C7C2B8]/50 text-sm">
-            No lots logged under this filter yet.
+          <p className="text-[#F2EEE7]/50 text-sm">
+            Nothing logged under this category yet.
           </p>
         )}
       </section>
@@ -321,15 +376,15 @@ export default function OurWork() {
       {/* ============================ CONTACT CTA ============================ */}
       <section
         id="contact"
-        className="relative min-h-[60vh] flex flex-col items-center justify-center px-6 text-center border-t border-[#565C5E]/25"
+        className="min-h-[60vh] flex flex-col items-center justify-center px-6 text-center border-t border-white/10"
       >
-        <p className="font-['IBM_Plex_Mono'] text-[10px] tracking-[0.3em] text-[#E8542E] mb-4 uppercase">
-          [ Ready when you are ]
+        <p className="font-mono text-[10px] tracking-[0.3em] text-[#C98A54] mb-4 uppercase">
+          Ready when you are
         </p>
-        <h2 className="font-['Oswald'] uppercase font-semibold tracking-tight text-3xl md:text-4xl max-w-lg mb-6">
-          Your lot could be next in the log.
+        <h2 className="font-serif text-3xl md:text-4xl max-w-lg mb-6">
+          Your lot could be the next one logged here.
         </h2>
-        <button className="text-[11px] font-['IBM_Plex_Mono'] tracking-[0.2em] uppercase bg-[#C7C2B8] text-[#121210] px-6 py-3 border border-dashed border-transparent hover:bg-[#E8542E] hover:border-[#121210] transition-colors">
+        <button className="text-[11px] font-mono tracking-[0.2em] uppercase bg-[#F2EEE7] text-[#0B0C0E] px-6 py-3 rounded-full hover:bg-[#C98A54] transition-colors">
           Contact us
         </button>
       </section>
