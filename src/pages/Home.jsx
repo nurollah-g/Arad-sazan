@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import excavationImg from "./assets/stage-excavation.jpg";
-import foundationImg from "./assets/stage-foundation.jpg";
-import framingImg from "./assets/stage-framing.jpg";
-import envelopeImg from "./assets/stage-envelope.jpg";
-import finishedImg from "./assets/stage-finished.jpg";
-import logo from "./assets/logo.png";
+import excavationImg from "../assets/stage-excavation.jpg";
+import foundationImg from "../assets/stage-foundation.jpg";
+import framingImg from "../assets/stage-framing.jpg";
+import envelopeImg from "../assets/stage-envelope.jpg";
+import finishedImg from "../assets/stage-finished.jpg";
+import logo from "../assets/logo.png";
 
 const STAGE_IMAGES = {
   excavation: excavationImg,
